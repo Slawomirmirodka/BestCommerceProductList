@@ -1,0 +1,65 @@
+{
+	"info": {
+		"_postman_id": "3b202815-b5dd-46a7-b7cd-46bed51b896a",
+		"name": "ProductList",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "BEST CODDING",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic"
+				},
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"environment\":  \"PRODUCTION\",\r\n    \"apikey\":  \"1\",\r\n    \"orgId\": \"1.\",\r\n    \"xml\" : \"<?xml version=\\\"1.0\\\">\"\r\n}  ",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:7800/producctlist/v1/getList/?offset=1&sort=price&rows=5&sortingDirecion=desc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "7800",
+					"path": [
+						"producctlist",
+						"v1",
+						"getList",
+						""
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "1"
+						},
+						{
+							"key": "sort",
+							"value": "price"
+						},
+						{
+							"key": "rows",
+							"value": "5"
+						},
+						{
+							"key": "sortingDirecion",
+							"value": "desc"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
