@@ -1,3 +1,3 @@
 # BestCommerceProductList
-REST API is not protected by SQLIncection. I realise that. In real project I will add functionality to save before that. 
-But in due to limited time I deliver only MVP.
+REST API is not protected against SQLIncection. I am aware of this. In real design, I will add the functionality to protect against this. 
+But due to time constraints, I only provide MVP.
