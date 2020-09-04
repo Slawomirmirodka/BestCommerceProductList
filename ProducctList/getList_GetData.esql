@@ -1,0 +1,88 @@
+
+
+CREATE COMPUTE MODULE getList_GetData
+CREATE FUNCTION Main() RETURNS BOOLEAN
+	BEGIN
+		CALL CopyMessageHeaders();
+		CALL GetData();
+		RETURN TRUE;
+	END;
+
+	CREATE PROCEDURE CopyMessageHeaders() BEGIN
+		DECLARE I INTEGER 1;
+		DECLARE J INTEGER;
+		SET J = CARDINALITY(InputRoot.*[]);
+		WHILE I < J DO
+			SET OutputRoot.*[I] = InputRoot.*[I];
+			SET I = I + 1;
+		END WHILE;
+		SET OutputLocalEnvironment = InputLocalEnvironment;
+	END;
+	
+	CREATE PROCEDURE GetData() BEGIN
+		DECLARE Rows INTEGER;
+		DECLARE Offset INTEGER;
+		DECLARE sort CHARACTER;
+		DECLARE SortDirection CHARACTER;
+		
+		SET Rows = InputLocalEnvironment.REST.Input.Parameters.rows;
+		SET Offset = InputLocalEnvironment.REST.Input.Parameters.offset;
+		SET sort = InputLocalEnvironment.REST.Input.Parameters.sort;
+		SET SortDirection = InputLocalEnvironment.REST.Input.Parameters.sortingDirecion;
+		
+		DECLARE SortField CHARACTER;
+		
+		IF sort IS NOT NULL AND SortDirection IS NOT NULL THEN 
+			SET SortField = 'ORDER BY ' 
+			|| queryString(sort) 
+			|| ' '
+			|| queryString(SortDirection)
+			|| ' ';
+		END IF;
+		
+		DECLARE Pagination CHARACTER;
+		
+		SET Pagination = 
+				'LIMIT '
+				|| CAST(Rows as CHARACTER)
+				|| ' '
+				|| 'OFFSET '
+				|| CAST((Rows * (Offset -1)) AS CHARACTER);
+		
+		DECLARE SQLQuery CHARACTER;
+		SET SQLQuery = 'SELECT id, category, name, description, unitprice, inventory, paymentoption, deliverymethod
+						FROM public.products WHERE inventory > 5 '
+						|| SortField
+						|| Pagination
+						|| ';';
+		SET Environment.Variables.SQLQUERY = SQLQuery;
+		SET Environment.Variables.DBDATA[] = PASSTHRU(SQLQuery);	
+		DECLARE I INTEGER 1;
+		
+		FOR product AS Environment.Variables.DBDATA[] DO 
+			
+			SET OutputRoot.JSON.Data.Item[I].id = product.id;
+			SET OutputRoot.JSON.Data.Item[I].category = product.category;
+			SET OutputRoot.JSON.Data.Item[I].name = product.name;
+			SET OutputRoot.JSON.Data.Item[I].description = product.description;
+			SET OutputRoot.JSON.Data.Item[I].unitprice = product.unitprice;
+			SET OutputRoot.JSON.Data.Item[I].inventory = product.inventory;
+			SET OutputRoot.JSON.Data.Item[I].paymentoption = product.paymentoption;
+			SET OutputRoot.JSON.Data.Item[I].deliverymethod = product.deliverymethod;
+			
+			SET I = I +1;
+		END FOR;
+	END;
+	
+	
+	CREATE  FUNCTION queryString( IN value CHARACTER ) RETURNS CHARACTER
+		BEGIN
+			CASE 
+			WHEN value IS NULL OR  value ='' THEN
+				RETURN '';
+			ELSE
+				RETURN  value ;
+			END CASE;			
+		END; 
+	
+END MODULE;
